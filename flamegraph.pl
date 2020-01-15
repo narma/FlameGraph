@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl -w
 #
 # flamegraph.pl		flame stack grapher.
 #
@@ -233,7 +233,7 @@ if ($bgcolors eq "") {
 	# choose a default
 	if ($colors eq "mem") {
 		$bgcolors = "green";
-	} elsif ($colors =~ /^(io|wakeup|chain)$/) {
+	} elsif ($colors =~ /^(io|wakeup|chain|scala-compilation)$/) {
 		$bgcolors = "blue";
 	} elsif ($colors =~ /^(red|green|blue|aqua|yellow|purple|orange)$/) {
 		$bgcolors = "grey";
@@ -398,6 +398,16 @@ sub color {
 	}
 
 	# multi palettes
+	if (defined $type and $type eq "scala-compilation") {
+		if ($name =~ m:_\[i\]$:) {	# macro
+			return $type = "rgb(0,199,169)";
+		} elsif ($name =~ m:_\[j\]$:) {	# macro failure
+			$type = "red";
+		} else {			# normal scala code
+			$type = "green";
+		}
+		# fall-through to color palettes
+	}
 	if (defined $type and $type eq "java") {
 		# Handle both annotations (_[j], _[i], ...; which are
 		# accurate), as well as input that lacks any annotations, as
